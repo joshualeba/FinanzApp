@@ -127,28 +127,38 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        password = request.form.get('password')
+        try:
+            name = request.form.get('name')
+            email = request.form.get('email')
+            password = request.form.get('password')
+
+            if not email or not password:
+                return jsonify({'success': False, 'message': 'Por favor, completa todos los campos.'})
+            
+            # Capitalizar nombre correctamente
+            if name:
+                name = name.title()
+
+            user = User.query.filter_by(email=email).first()
+            if user:
+                return jsonify({'success': False, 'message': 'El correo electrónico ya está registrado.'})
+
+            import re
+            if not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,}$", email):
+                 return jsonify({'success': False, 'message': 'Por favor, ingresa un correo electrónico válido con un dominio real.'})
+
+            # Usar método por defecto de werkzeug (más compatible)
+            new_user = User(name=name, email=email, password=generate_password_hash(password))
+            db.session.add(new_user)
+            db.session.commit()
+
+            login_user(new_user)
+            return jsonify({'success': True, 'redirect': url_for('dashboard')})
         
-        # Capitalizar nombre correctamente
-        if name:
-            name = name.title()
-
-        user = User.query.filter_by(email=email).first()
-        if user:
-            return jsonify({'success': False, 'message': 'El correo electrónico ya está registrado.'})
-
-        import re
-        if not re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,}$", email):
-             return jsonify({'success': False, 'message': 'Por favor, ingresa un correo electrónico válido con un dominio real.'})
-
-        new_user = User(name=name, email=email, password=generate_password_hash(password, method='scrypt'))
-        db.session.add(new_user)
-        db.session.commit()
-
-        login_user(new_user)
-        return jsonify({'success': True, 'redirect': url_for('dashboard')})
+        except Exception as e:
+            print(f"Error en Registro: {e}")
+            db.session.rollback()
+            return jsonify({'success': False, 'message': f"Error del servidor: {str(e)}"})
 
     return render_template('register.html')
 
@@ -205,10 +215,11 @@ def google_callback():
             # Capitalizar nombre si existe
             if name: name = name.title()
             
+            # Usar método por defecto para compatibilidad
             user = User(
                 name=name or email.split('@')[0], 
                 email=email, 
-                password=generate_password_hash(random_pwd, method='scrypt')
+                password=generate_password_hash(random_pwd)
             )
             db.session.add(user)
             db.session.commit()
@@ -218,7 +229,7 @@ def google_callback():
     except Exception as e:
         # En producción usar logger
         print(f"Error en Google Login: {e}")
-        flash("Ocurrió un error al iniciar sesión con Google. Verifique sus credenciales.", "error")
+        flash(f"Error al iniciar sesión con Google: {str(e)}", "error")
         return redirect(url_for('login'))
 
 @app.route('/dashboard')
