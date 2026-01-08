@@ -250,7 +250,10 @@
         loader.style.display = 'flex';
 
         fetch('/register', { method: 'POST', body: new FormData(this) })
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) { throw new Error('Server returned ' + r.status); }
+                return r.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Success: Keep loader, wait 2s, then redirect

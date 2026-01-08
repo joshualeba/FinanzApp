@@ -97,7 +97,10 @@
         loader.style.display = 'flex';
 
         fetch('/login', { method: 'POST', body: new FormData(this) })
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) { throw new Error('Server returned ' + r.status); }
+                return r.json();
+            })
             .then(data => {
                 loader.style.display = 'none';
                 if (data.success) window.location.href = data.redirect;
