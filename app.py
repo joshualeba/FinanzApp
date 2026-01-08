@@ -219,7 +219,7 @@ def google_callback():
             user = User(
                 name=name or email.split('@')[0], 
                 email=email, 
-                password=generate_password_hash(random_pwd)
+                password=generate_password_hash(random_pwd, method='pbkdf2:sha256')
             )
             db.session.add(user)
             db.session.commit()
