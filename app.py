@@ -17,6 +17,12 @@ app = Flask(__name__)
 # Fix para Render: Permitir que Flask detecte HTTPS detrás del proxy
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
+# Configuración de Seguridad para Producción (Render)
+if os.environ.get('RENDER'):
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['PREFERRED_URL_SCHEME'] = 'https'
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev')
 
 
