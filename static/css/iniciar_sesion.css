@@ -1,0 +1,575 @@
+/* CSS para Auth - Estilo Light Mode Premium */
+body {
+    background-color: #F8FAFC;
+    color: #1E293B;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+}
+
+.contenedor {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.lado-izquierdo,
+.lado-derecho {
+    width: 50%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Lado Formulario (Izquierdo en Desktop) */
+.lado-izquierdo {
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.formulario {
+    width: 80%;
+    max-width: 450px;
+    padding: 2rem;
+}
+
+.formulario h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1E3A8A;
+    margin-bottom: 0.5rem;
+}
+
+.formulario p {
+    margin-bottom: 2rem;
+    color: #64748B;
+}
+
+.formulario p a {
+    color: #D97706;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.formulario p a:hover {
+    text-decoration: underline;
+}
+
+.formulario form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+input {
+    background: #F1F5F9;
+    border: 2px solid transparent;
+    padding: 14px 16px;
+    border-radius: 12px;
+    color: #1E293B;
+    outline: none;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+input:focus {
+    border-color: #3B82F6;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+input::placeholder {
+    color: #94A3B8;
+}
+
+.input-container {
+    position: relative;
+}
+
+.input-container span {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #94A3B8;
+}
+
+.boton-principal {
+    background-color: #1E3A8A;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+}
+
+.boton-principal:hover {
+    background-color: #172554;
+    transform: translateY(-1px);
+}
+
+.boton-google {
+    background-color: #FFFFFF;
+    color: #1E293B;
+    border: 1px solid #CBD5E1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.boton-google:hover {
+    background-color: #F8FAFC;
+    border-color: #94A3B8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #94A3B8;
+    font-size: 0.85rem;
+}
+
+.separator::before,
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.separator:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.separator:not(:empty)::after {
+    margin-left: .5em;
+}
+
+/* Password Checklist */
+.password-checklist {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748B;
+}
+
+.check-item {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+}
+
+.check-item i {
+    font-size: 0.9rem;
+    color: #CBD5E1;
+}
+
+.check-item.valid {
+    color: #10B981;
+}
+
+.check-item.valid i {
+    color: #10B981;
+}
+
+/* Lado Video (Derecho) */
+.lado-derecho video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.logo-overlay {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10;
+}
+
+.logo-overlay img {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.boton-volver {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 50px;
+    color: #1E3A8A;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    z-index: 100;
+    /* Increased z-index */
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.boton-volver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+/* Alerts */
+.error-message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.error-message-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.error-message-box {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    /* Or dark if background is light */
+    padding: 1.5rem 3rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 90%;
+}
+
+/* Ensure text is readable on glass */
+.error-message-box p {
+    margin: 0;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal Styles Copied from Index */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-content {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    padding: 3rem;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    overflow-y: auto;
+    color: #1E293B;
+    /* var(--text-dark) */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    position: relative;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h3 {
+    color: #1E3A8A;
+    /* var(--primary-color) */
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.modal-content h5 {
+    color: #D97706;
+    /* var(--accent-color) */
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.modal-content p,
+.modal-content li {
+    color: #1E293B;
+    /* var(--text-dark) */
+    text-align: justify;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1.5rem;
+    right: 2rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #64748B;
+    /* var(--text-light) */
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #1E3A8A;
+    /* var(--primary-color) */
+}
+
+/* Checkbox Style */
+.terms-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #64748B;
+    margin-top: 0.5rem;
+}
+
+.terms-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    accent-color: #1E3A8A;
+    /* var(--primary-color) */
+}
+
+.terms-checkbox a {
+    color: #D97706;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.terms-checkbox a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile - Glassmorphism & Merge */
+/* Mobile - Glassmorphism & Merge */
+@media (max-width: 900px) {
+    body {
+        overflow-y: auto;
+        /* Allow scroll on mobile */
+    }
+
+    .contenedor {
+        position: relative;
+        flex-direction: column;
+        min-height: 100vh;
+        /* Allow it to grow */
+        height: auto;
+    }
+
+    /* Video Background Fixed */
+    .lado-derecho {
+        display: block;
+        position: fixed;
+        /* Fixed background */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .lado-derecho video {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Form Container (Scrollable Content) */
+    .lado-izquierdo {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        background: transparent;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* Center vertically if content is short */
+        padding-top: 100px;
+        /* Space for top buttons/logo */
+        padding-bottom: 50px;
+        pointer-events: none;
+        /* Allow clicks to pass through transparent areas */
+    }
+
+    /* Glassmorphism Form */
+    .formulario {
+        background: rgba(255, 255, 255, 0.85);
+        /* More opaque white for readability */
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        padding: 2.5rem;
+        margin: 0 auto;
+        width: 90%;
+        max-width: 450px;
+        color: #1E293B !important;
+        /* Force dark text */
+        pointer-events: auto;
+        /* Re-enable clicks on the form itself */
+    }
+
+    .formulario h2,
+    .formulario p {
+        color: #1E293B;
+        /* Ensure headers and paragraphs are dark */
+    }
+
+    /* Ensure buttons/logo stay fixed at top */
+    .logo-overlay {
+        position: fixed;
+        z-index: 20;
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .logo-overlay img {
+        width: 60px;
+        /* Reduced size for mobile */
+    }
+
+    .boton-volver {
+        position: fixed;
+        z-index: 20000;
+        top: 1.5rem;
+        left: 1.5rem;
+    }
+
+    .formulario .d-md-none {
+        display: none !important;
+    }
+}
+
+/* Loader Styles */
+#loader-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF !important;
+    z-index: 9999;
+    display: none;
+    /* Hidden by default, toggled via JS */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s;
+}
+
+/* CSS para SVG Loader */
+.svg-loader {
+    --uib-size: 50px;
+    --uib-color: #D97706;
+    --uib-speed: .9s;
+    --uib-bg-opacity: .1;
+    height: var(--uib-size);
+    width: var(--uib-size);
+    transform-origin: center;
+    overflow: visible;
+}
+
+.loader-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.25rem;
+    color: black;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.car {
+    fill: none;
+    stroke: var(--uib-color);
+    stroke-dasharray: 15, 85;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    animation: travel var(--uib-speed) linear infinite;
+    will-change: stroke-dasharray, stroke-dashoffset;
+    transition: stroke 0.5s ease;
+}
+
+.track {
+    stroke: var(--uib-color);
+    opacity: var(--uib-bg-opacity);
+    transition: stroke 0.5s ease;
+}
+
+@keyframes travel {
+    0% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: 100;
+    }
+}

@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+
+{% block title %}Movimientos - FinanzApp{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2 text-decoration-none" style="cursor: default;">
+                <img src="{{ url_for('static', filename='multimedia/logo.png') }}" alt="FinanzApp Logo">
+                <span>FinanzApp</span>
+            </div>
+            <button id="closeSidebar" class="d-lg-none btn btn-link text-white">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <ul class="nav-links mt-4">
+            <li class="nav-item">
+                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Panel de control</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>Movimientos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    <span>Calendario</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-file-earmark-bar-graph-fill"></i>
+                    <span>Reportes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-robot"></i>
+                    <span>Asistente IA</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Configuración</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="logout-container">
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+        <!-- Top Navbar -->
+        <header class="top-navbar">
+            <div class="d-flex align-items-center gap-3">
+                <button id="openSidebar" class="d-lg-none btn btn-link p-0 text-body">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+                <div class="welcome-text">
+                    <h2 class="d-none d-sm-block">Movimientos</h2>
+                    <h2 class="d-sm-none">Movimientos</h2>
+                    <p class="d-none d-sm-block">Registra y gestiona tus ingresos y gastos.</p>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Cambiar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <div class="user-profile" id="userProfileBtn">
+                    <div class="user-info text-end d-none d-md-block">
+                        <span class="user-name">{{ current_user.name }}</span>
+                        <span class="user-plan">Plan gratuito</span>
+                    </div>
+                    <div class="user-avatar ms-2">
+                        {{ current_user.name[0] | upper }}
+                    </div>
+                    <i class="bi bi-chevron-down ms-2 transition-icon" id="profileChevron"></i>
+
+                    <!-- Dropdown Menu -->
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <div class="dropdown-header">
+                            <span class="d-block fw-bold">{{ current_user.name }}</span>
+                            <span class="d-block text-muted small">Plan gratuito</span>
+                        </div>
+                        <ul class="dropdown-menu-list">
+                            <li><a href="#"><i class="bi bi-person"></i> Mi perfil</a></li>
+                            <li><a href="#"><i class="bi bi-star"></i> Suscripción Premium</a></li>
+                            <li><a href="#"><i class="bi bi-question-circle"></i> Ayuda y soporte</a></li>
+                            <li class="dropdown-divider"></li>
+                            <li><a href="#" class="text-danger" id="logoutInfoDrop"><i
+                                        class="bi bi-box-arrow-right"></i> Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="content-body">
+
+            <div class="row">
+                <!-- Form Column -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm" style="background: var(--card-bg);">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-4" style="color: var(--text-main);">Registrar movimiento</h4>
+                            <form action="{{ url_for('movements') }}" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Título</label>
+                                    <input type="text" name="title" class="form-control" placeholder="Ej: Supermercado"
+                                        required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Monto</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" name="amount" class="form-control"
+                                            placeholder="0.00" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Tipo</label>
+                                    <select name="type" class="form-select" required>
+                                        <option value="expense">Gasto</option>
+                                        <option value="income">Ingreso</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Categoría</label>
+                                    <select name="category" class="form-select" required>
+                                        <option value="Comida">Comida</option>
+                                        <option value="Transporte">Transporte</option>
+                                        <option value="Vivienda">Vivienda</option>
+                                        <option value="Salud">Salud</option>
+                                        <option value="Entretenimiento">Entretenimiento</option>
+                                        <option value="Salario">Salario</option>
+                                        <option value="Otros">Otros</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 py-2">Guardar movimiento</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Column -->
+                <div class="col-lg-8">
+                    <div class="card h-100 border-0 shadow-sm" style="background: var(--card-bg);">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-4" style="color: var(--text-main);">Historial reciente</h4>
+                            <div class="table-responsive">
+                                <table class="table align-middle" style="color: var(--text-main);">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-muted border-0">Título</th>
+                                            <th class="text-muted border-0">Categoría</th>
+                                            <th class="text-muted border-0">Fecha</th>
+                                            <th class="text-end text-muted border-0">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for t in transactions %}
+                                        <tr style="border-bottom: 1px solid var(--border-color);">
+                                            <td class="py-3">{{ t.title }}</td>
+                                            <td class="py-3"><span class="badge bg-light text-dark">{{ t.category
+                                                    }}</span></td>
+                                            <td class="py-3">{{ t.date.strftime('%d/%m/%Y') }}</td>
+                                            <td
+                                                class="py-3 text-end fw-bold {{ 'text-success' if t.type == 'income' else 'text-danger' }}">
+                                                {{ '+' if t.type == 'income' else '-' }}${{ "{:,.2f}".format(t.amount)
+                                                }}
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-5 text-muted">
+                                                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                                                No hay movimientos registrados aún.
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Logout Modal -->
+<div id="logout-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Cerrar Sesión</h3>
+        <p>¿Estás seguro de que deseas cerrar tu sesión?</p>
+        <div class="modal-actions">
+            <button id="cancel-logout" class="btn-cancel">Cancelar</button>
+            <button id="confirm-logout" class="btn-confirm">Cerrar Sesión</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoutBtn = document.querySelector('.logout-btn');
+        const modal = document.getElementById('logout-modal');
+        const cancelBtn = document.getElementById('cancel-logout');
+        const confirmBtn = document.getElementById('confirm-logout');
+
+        // Show Modal
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modal.style.display = 'flex';
+            });
+        }
+
+        // Hide Modal
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+        }
+
+        // Handle Confirmation
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                window.location.href = "{{ url_for('logout') }}";
+            });
+        }
+
+        // Close on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = themeToggleBtn.querySelector('i');
+        const body = document.body;
+
+        // Check local storage
+        if (localStorage.getItem('theme') === 'dark') {
+            body.setAttribute('data-theme', 'dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (body.hasAttribute('data-theme')) {
+                body.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        });
+
+        // Dropdown Logic
+        const profileBtn = document.getElementById('userProfileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const logoutInfoDrop = document.getElementById('logoutInfoDrop');
+        const profileChevron = document.getElementById('profileChevron');
+
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+            if (profileChevron) profileChevron.classList.toggle('rotate-180');
+        });
+
+        // Close dropdown on outside click
+        window.addEventListener('click', (e) => {
+            if (!profileBtn.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+                if (profileChevron) profileChevron.classList.remove('rotate-180');
+            }
+        });
+
+        // Bind Logout Modal to Dropdown Link
+        if (logoutInfoDrop) {
+            logoutInfoDrop.addEventListener('click', (e) => {
+                e.preventDefault();
+                const modal = document.getElementById('logout-modal');
+                if (modal) modal.style.display = 'flex';
+            });
+        }
+
+        // Mobile Sidebar Logic
+        const openSidebarBtn = document.getElementById('openSidebar');
+        const closeSidebarBtn = document.getElementById('closeSidebar');
+        const sidebar = document.querySelector('.sidebar');
+        const mainWrapper = document.querySelector('.main-wrapper');
+
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'sidebar-backdrop';
+        document.body.appendChild(backdrop);
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active');
+        }
+
+        if (openSidebarBtn) openSidebarBtn.addEventListener('click', toggleSidebar);
+        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
+        backdrop.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            backdrop.classList.remove('active');
+        });
+    });
+</script>
+{% endblock %}

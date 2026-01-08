@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+openai
+tavily-python
+authlib
+requests
+python-dotenv
+gunicorn
+psycopg2-binary

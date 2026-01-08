@@ -1,0 +1,1057 @@
+{% extends 'base.html' %}
+
+{% block title %}FinanzApp - El futuro de tus finanzas{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="bg-decoration bg-blob-1"></div>
+<div class="bg-decoration bg-blob-2"></div>
+<!-- Loader -->
+<div id="loader-screen"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #FFFFFF; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s;">
+    <svg class="svg-loader" x="0px" y="0px" viewBox="0 0 37 37" preserveAspectRatio="xMidYMid meet">
+        <path class="track" fill="none" stroke-width="5" pathLength="100"
+            d="M36.63 31.746 c0 -13.394 -7.3260000000000005 -25.16 -18.13 -31.375999999999998 C7.696 6.66 0.37 18.352 0.37 31.746 c5.328 3.108 11.544 4.8839999999999995 18.13 4.8839999999999995 S31.301999999999996 34.854 36.63 31.746z">
+        </path>
+        <path class="car" fill="none" stroke-width="5" pathLength="100"
+            d="M36.63 31.746 c0 -13.394 -7.3260000000000005 -25.16 -18.13 -31.375999999999998 C7.696 6.66 0.37 18.352 0.37 31.746 c5.328 3.108 11.544 4.8839999999999995 18.13 4.8839999999999995 S31.301999999999996 34.854 36.63 31.746z">
+        </path>
+    </svg>
+    <p class="loader-text">Preparando tus finanzas...</p>
+</div>
+<script>
+    // Critical Failsafe: Remove loader if scripts freeze
+    setTimeout(function () {
+        var loader = document.getElementById("loader-screen");
+        if (loader && loader.style.display !== 'none') {
+            loader.style.display = 'none';
+        }
+    }, 4000);
+</script>
+
+<!-- Navbar -->
+<!-- Custom Navbar -->
+<nav class="custom-navbar fixed-top">
+    <div class="container d-flex justify-content-between align-items-center py-3">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center" href="#home">
+            <img src="{{ url_for('static', filename='multimedia/logo.png') }}" alt="FinanzApp Logo" height="40">
+            <span class="ms-2 fw-bold text-white fs-4 brand-text">FinanzApp</span>
+        </a>
+
+        <!-- Desktop Menu -->
+        <ul class="desktop-menu d-none d-lg-flex align-items-center gap-4 list-unstyled mb-0">
+            <li><a class="nav-link text-white" href="#how-it-works">Cómo funciona</a></li>
+            <li><a class="nav-link text-white" href="#features">Beneficios</a></li>
+            <li><a class="nav-link text-white" href="#faq">Ayuda</a></li>
+
+            {% if current_user.is_authenticated %}
+            <li class="ms-3">
+                <a class="btn btn-accent-outline" href="{{ url_for('dashboard') }}">Dashboard</a>
+            </li>
+            {% else %}
+            <li class="ms-3">
+                <a class="btn btn-accent-outline" href="{{ url_for('login') }}">Iniciar sesión</a>
+            </li>
+            <li>
+                <a class="btn btn-accent" href="{{ url_for('register') }}">Registrarse gratis</a>
+            </li>
+            {% endif %}
+        </ul>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="hamburger-btn d-lg-none" id="mobileMenuBtn">
+            <i class="bi bi-list text-white fs-1"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Full Screen Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <div class="container d-flex justify-content-between align-items-center py-3">
+            <!-- Logo for Mobile Header -->
+            <a class="navbar-brand d-flex align-items-center" href="#home">
+                <img src="{{ url_for('static', filename='multimedia/logo.png') }}" alt="FinanzApp Logo" height="40">
+                <span class="ms-2 fw-bold text-white fs-4">FinanzApp</span>
+            </a>
+            <button class="close-menu-btn" id="closeMenuBtn">
+                <i class="bi bi-x text-white fs-1"></i>
+            </button>
+        </div>
+
+        <div class="mobile-menu-content h-100 d-flex flex-column justify-content-center align-items-center">
+            <ul class="list-unstyled text-center d-flex flex-column gap-4">
+                <li><a class="mobile-nav-link" href="#how-it-works" onclick="closeMobileMenu()">Cómo funciona</a></li>
+                <li><a class="mobile-nav-link" href="#features" onclick="closeMobileMenu()">Beneficios</a></li>
+                <li><a class="mobile-nav-link" href="#faq" onclick="closeMobileMenu()">Ayuda</a></li>
+
+                {% if current_user.is_authenticated %}
+                <li class="mt-4">
+                    <a class="btn btn-accent-outline btn-lg w-100" href="{{ url_for('dashboard') }}">Dashboard</a>
+                </li>
+                {% else %}
+                <li class="mt-4">
+                    <a class="btn btn-accent-outline btn-lg w-100 mb-3" href="{{ url_for('login') }}">Iniciar sesión</a>
+                </li>
+                <li>
+                    <a class="btn btn-accent btn-lg w-100" href="{{ url_for('register') }}">Registrarse gratis</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="hero-section">
+    <video class="hero-video" autoplay muted loop playsinline preload="metadata" id="heroVideo">
+        <!-- Placeholder until user provides prompt generated video -->
+        <source src="{{ url_for('static', filename='multimedia/videohero.mp4') }}" type="video/mp4">
+        Tu navegador no soporta videos HTML5.
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content animate__animated animate__fadeInUp">
+        <h1 class="hero-title">
+            Toma el control para <br>
+            <span id="typed-text" style="color: #D97706;"></span>
+        </h1>
+        <p class="hero-subtitle">
+            La plataforma inteligente que centraliza, analiza y optimiza tus finanzas personales y empresariales en un
+            solo lugar.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard') }}" class="btn-hero">
+                <i class="bi bi-speedometer2 me-2"></i> Ir a mi Dashboard
+            </a>
+            {% else %}
+            <a href="{{ url_for('register') }}" class="btn-hero">
+                <i class="bi bi-rocket-takeoff me-2"></i> Empezar ahora
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section Removida por solicitud del usuario (Información falsa) -->
+
+<!-- How It Works -->
+<section id="how-it-works" class="section-padding">
+    <div class="container">
+        <h2 class="section-title">Tu camino a la libertad financiera</h2>
+        <p class="section-subtitle">En solo tres pasos estarás operando como un experto.</p>
+
+        <div class="row g-5 mt-4">
+            <div class="col-md-4 text-center step-card">
+                <div class="step-number">01</div>
+                <h3 class="fw-bold mt-4 mb-3">Regístrate</h3>
+                <p class="text-muted">Crea tu cuenta en segundos y configura tu perfil financiero personalizado.</p>
+            </div>
+            <div class="col-md-4 text-center step-card">
+                <div class="step-number">02</div>
+                <h3 class="fw-bold mt-4 mb-3">Registra</h3>
+                <p class="text-muted">Ingresa tus ingresos y gastos manualmente de forma rápida y sencilla.</p>
+            </div>
+            <div class="col-md-4 text-center step-card">
+                <div class="step-number">03</div>
+                <h3 class="fw-bold mt-4 mb-3">Optimiza</h3>
+                <p class="text-muted">Recibe consejos de nuestra IA y mejora tu capacidad de ahorro cada mes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="section-padding bg-secondary-custom">
+    <div class="container">
+        <h2 class="section-title">Herramientas profesionales</h2>
+        <p class="section-subtitle">Todo lo que necesitas para dejar de usar Excel.</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-pie-chart"></i></div>
+                    <h4>Visualización de datos</h4>
+                    <p class="text-muted">Gráficos interactivos que te muestran exactamente a dónde va tu dinero cada
+                        mes.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-shield-check"></i></div>
+                    <h4>Privacidad total</h4>
+                    <p class="text-muted">Tus datos son ingresados por ti. No pedimos claves bancarias ni accesos
+                        indebidos.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+                    <h4>Inteligencia artificial</h4>
+                    <p class="text-muted">Nuestro asesor Aurelius analiza tus hábitos y te da consejos personalizados.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-wallet2"></i></div>
+                    <h4>Presupuestos mensuales</h4>
+                    <p class="text-muted">Establece límites de gasto por categoría y mantén tus finanzas bajo control.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-cloud-arrow-down"></i></div>
+                    <h4>Exportación fácil</h4>
+                    <p class="text-muted">Descarga tus reportes en PDF o Excel listos para tu archivo personal.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-trophy"></i></div>
+                    <h4>Metas de ahorro</h4>
+                    <p class="text-muted">Define objetivos como un viaje o un coche y monitorea tu progreso real.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials" class="section-padding">
+    <div class="container position-relative">
+        <h2 class="section-title">Confían en nosotros</h2>
+        <div class="swiper mySwiper mt-5 pt-3 mb-5 px-5">
+            <div class="swiper-wrapper">
+                <!-- Slide 1 -->
+                <div class="swiper-slide h-auto p-3">
+                    <div class="testimonial-card-premium">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="testimonial-text">"Llevaba años usando Excel y era un caos. Desde que migré a
+                            FinanzApp, tengo el control total de mis gastos. Los presupuestos me han ayudado a ahorrar
+                            de verdad."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">RM</div>
+                            <div class="author-info">
+                                <h6>Roberto Méndez</h6>
+                                <small>Emprendedor</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="swiper-slide h-auto p-3">
+                    <div class="testimonial-card-premium">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="testimonial-text">"Como freelance, mis ingresos varían mucho. Aurelius AI me ha dado
+                            consejos increíbles para gestionar mis meses bajos. ¡Muy recomendada!"</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">LT</div>
+                            <div class="author-info">
+                                <h6>Laura Torres</h6>
+                                <small>Diseñadora freelance</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="swiper-slide h-auto p-3">
+                    <div class="testimonial-card-premium">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="testimonial-text">"Me gusta que no me pida conectar mi banco. Prefiero registrar mis
+                            gastos manualmente y sentirme seguro. La interfaz es súper limpia."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">JR</div>
+                            <div class="author-info">
+                                <h6>Javier Ruiz</h6>
+                                <small>Consultor</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 4 -->
+                <div class="swiper-slide h-auto p-3">
+                    <div class="testimonial-card-premium">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="testimonial-text">"Las metas de ahorro son lo mejor. Pude visualizar mi objetivo para
+                            las vacaciones y el sistema me decía cuánto guardar cada día."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">MG</div>
+                            <div class="author-info">
+                                <h6>María González</h6>
+                                <small>Ama de casa</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 5 -->
+                <div class="swiper-slide h-auto p-3">
+                    <div class="testimonial-card-premium">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="testimonial-text">"Poder descargar un reporte en PDF de mis finanzas mensuales me
+                            ahorra muchísimo tiempo. Simple, rápida y efectiva."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">CV</div>
+                            <div class="author-info">
+                                <h6>Carlos Vela</h6>
+                                <small>Comerciante</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 6 -->
+                <div class="swiper-slide h-auto p-3">
+                    <div class="testimonial-card-premium">
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="testimonial-text">"Soy estudiante y mi presupuesto es ajustado. Esta app es perfecta
+                            para ver en qué se me va el dinero y corregirlo a tiempo."</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">SC</div>
+                            <div class="author-info">
+                                <h6>Sofía Castro</h6>
+                                <small>Estudiante universitaria</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Moved buttons outside wrapper but inside container, updated css will position them -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="section-padding bg-secondary-custom">
+    <div class="container" style="max-width: 800px;">
+        <h2 class="section-title">Preguntas frecuentes</h2>
+        <div class="accordion mt-5" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOne">
+                        ¿Debo conectar mi cuenta bancaria?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        No. FinanzApp funciona con registro manual, lo que te da total control y privacidad sobre tus
+                        datos.
+                        Solo tú decides qué información ingresar, sin compartir credenciales bancarias.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseTwo">
+                        ¿Puedo crear presupuestos personalizados?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Sí, puedes establecer límites de gasto mensuales por categoría (ej. "Comida", "Transporte").
+                        Verás barras de progreso visuales para ayudarte a no gastar de más.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseThree">
+                        ¿Cómo funciona la inteligencia artificial?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Aurelius AI analiza tus patrones de ingreso y gasto para darte consejos personalizados,
+                        detectar gastos hormiga y ayudarte a planear mejor tu ahorro mensual.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFour">
+                        ¿Tiene algún costo utilizar la aplicación?
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        No, actualmente FinanzApp es completamente gratuita. Puedes registrar transacciones ilimitadas,
+                        crear presupuestos y usar la IA sin costo alguno.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFive">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseFive">
+                        ¿Mis datos están seguros?
+                    </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Absolutamente. Aunque no conectamos con bancos, protegemos tu información con los más altos
+                        estándares de seguridad y encriptación. Tu privacidad es nuestra prioridad.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingSix">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseSix">
+                        ¿Puedo exportar mi información?
+                    </button>
+                </h2>
+                <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Sí. Puedes descargar reportes mensuales en formato PDF para tener un respaldo físico de tu
+                        actividad financiera o para compartirlo con quien desees.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-5 mb-lg-0">
+                <a href="#" class="footer-logo mb-3 d-block">
+                    <img src="{{ url_for('static', filename='multimedia/logo.png') }}" alt="FinanzApp">
+                    <span class="text-white fw-bold fs-4 ms-2">FinanzApp</span>
+                </a>
+                <p class="text-white-50">Empoderando tus decisiones financieras con tecnología de vanguardia.</p>
+                <div class="social-links mt-4">
+                    <a href="#"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                    <a href="#"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Producto</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#">Características</a></li>
+                    <li><a href="#">Precios</a></li>
+                    <li><a href="#">Seguridad</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Compañía</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#">Nosotros</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Carreras</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <h5>Legal</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" id="termsLink">Términos y condiciones</a></li>
+                    <li><a href="#" id="privacyLink">Política de privacidad</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-top border-secondary mt-5 pt-4 text-center text-white-50">
+            <p>&copy; 2025 FinanzApp Inc. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Modals -->
+<div id="terms-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" id="closeTerms">&times;</span>
+        <h3>Términos y condiciones de uso</h3>
+        <div class="terms-body">
+            <p><strong>Última actualización: 11 de Diciembre de 2025</strong></p>
+            <p>Bienvenido a FinanzApp. Al acceder a nuestra plataforma, usted acepta someterse a los siguientes términos
+                legales. Lea detenidamente.</p>
+
+            <h5>1. Aceptación de términos</h5>
+            <p>Al registrarse y utilizar FinanzApp, usted confirma que tiene mayoría de edad legal y capacidad para
+                contraer acuerdos vinculantes.</p>
+
+            <h5>2. Licencia de uso</h5>
+            <p>Concedemos una licencia limitada, no exclusiva e intransferible para usar el servicio estrictamente para
+                fines personales y no comerciales.</p>
+
+            <h5>3. Privacidad y seguridad</h5>
+            <p>Su privacidad es primordial. Empleamos encriptación de grado militar (AES-256). Consulte nuestra Política
+                de Privacidad para detalles sobre el manejo de datos.</p>
+
+            <h5>4. Propiedad intelectual</h5>
+            <p>Todo el contenido, marcas, logotipos y algoritmos son propiedad exclusiva de FinanzApp Inc. Queda
+                prohibida su reproducción sin autorización.</p>
+
+            <h5>5. Exactitud de la información</h5>
+            <p>Aunque nos esforzamos por la precisión, no garantizamos que los análisis automatizados estén libres de
+                errores. Usted debe verificar sus datos antes de tomar decisiones críticas.</p>
+
+            <h5>6. Responsabilidad limitada</h5>
+            <p>FinanzApp no será responsable por daños indirectos, pérdida de beneficios o datos derivados del uso o
+                imposibilidad de uso del servicio.</p>
+
+            <h5>7. Tarifas y pagos</h5>
+            <p>Ciertas funciones premium pueden requerir pago. Las tarifas se cobrarán por adelantado y no son
+                reembolsables, salvo disposición legal contraria.</p>
+
+            <h5>8. Modificaciones del servicio</h5>
+            <p>Nos reservamos el derecho de modificar o discontinuar temporal o permanentemente el servicio con o sin
+                previo aviso.</p>
+
+            <h5>9. Conducta del usuario</h5>
+            <p>Usted acepta no utilizar el servicio para actividades ilícitas, fraudulentas o que violen derechos de
+                terceros.</p>
+
+            <h5>10. Cancelación y terminación</h5>
+            <p>Puede cerrar su cuenta en cualquier momento. Nosotros podemos suspender su acceso si viola estos
+                términos.
+            </p>
+
+            <h5>11. Enlaces a terceros</h5>
+            <p>El servicio puede contener enlaces a sitios externos que no operamos. No somos asesores financieros y el
+                contenido de terceros es responsabilidad de sus autores.</p>
+
+            <h5>12. Jurisdicción</h5>
+            <p>Estos términos se rigen por las leyes locales de su país de residencia. Cualquier disputa se resolverá en
+                los tribunales competentes de dicha jurisdicción.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div id="privacy-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" id="closePrivacy">&times;</span>
+        <h3>Política de privacidad</h3>
+        <div class="terms-body">
+            <p><strong>Última actualización: 11 de Diciembre de 2025</strong></p>
+            <p>En FinanzApp, valoramos su privacidad y nos comprometemos a proteger su información personal.
+                Esta política describe cómo recopilamos, usamos y resguardamos sus datos.</p>
+
+            <h5>1. Información recopilada</h5>
+            <p>Recopilamos información personal como nombre, correo electrónico y datos financieros que usted
+                proporciona al registrarse o vincular sus cuentas bancarias.</p>
+
+            <h5>2. Uso de la información</h5>
+            <p>Utilizamos sus datos para proporcionar, mantener y mejorar nuestros servicios, procesar
+                transacciones y enviarle notificaciones relevantes.</p>
+
+            <h5>3. Compartir información</h5>
+            <p>No vendemos su información personal. Solo compartimos datos con terceros proveedores de servicios
+                necesarios para operar nuestra plataforma (ej. procesadores de pagos), bajo estrictos acuerdos
+                de confidencialidad.</p>
+
+            <h5>4. Seguridad de los datos</h5>
+            <p>Implementamos medidas de seguridad técnicas y organizativas robustas, incluyendo encriptación
+                SSL/TLS y almacenamiento seguro, para proteger sus datos contra acceso no autorizado.</p>
+
+            <h5>5. Cookies y tecnologías similares</h5>
+            <p>Utilizamos cookies para mejorar su experiencia de navegación, analizar el tráfico del sitio y
+                personalizar el contenido. Puede gestionar sus preferencias de cookies en la configuración de su
+                navegador.</p>
+
+            <h5>6. Sus derechos</h5>
+            <p>Usted tiene derecho a acceder, rectificar o eliminar su información personal. También puede
+                oponerse al procesamiento de sus datos o solicitar la portabilidad de los mismos.</p>
+
+            <h5>7. Retención de datos</h5>
+            <p>Conservamos su información mientras su cuenta esté activa o sea necesario para cumplir con
+                obligaciones legales. Una vez cerrada su cuenta, sus datos se eliminan o anonimizan de forma
+                segura.</p>
+
+            <h5>8. Transferencias internacionales</h5>
+            <p>Sus datos pueden ser transferidos y procesados en países distintos al suyo, siempre bajo marcos
+                legales que garanticen un nivel adecuado de protección.</p>
+
+            <h5>9. Cambios en la política</h5>
+            <p>Podemos actualizar esta política periódicamente. Le notificaremos cualquier cambio significativo
+                a través de nuestro sitio web o por correo electrónico.</p>
+
+            <h5>10. Menores de edad</h5>
+            <p>Nuestros servicios no están dirigidos a menores de 18 años. No recopilamos intencionalmente
+                información de menores. Si detectamos que se ha recopilado dicha información, la eliminaremos de
+                inmediato.</p>
+
+            <h5>11. Enlaces externos</h5>
+            <p>Nuestro sitio puede contener enlaces a sitios web de terceros. No somos responsables de las
+                prácticas de privacidad de dichos sitios.</p>
+
+            <h5>12. Contacto</h5>
+            <p>Si tiene preguntas sobre esta política, contáctenos en privacidad@finanzapp.com.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Chat Backdrop Blur -->
+<div class="chat-backdrop" id="chatBackdrop" onclick="toggleInfoChat()"></div>
+
+<!-- Invitatio Bubble -->
+<div class="chat-invite-bubble shadow-lg" id="chatInviteBubble" onclick="toggleInfoChat()">
+    <div class="close-invite" onclick="event.stopPropagation(); closeInviteBubble();"><i class="bi bi-x"></i></div>
+    <div class="d-flex align-items-center gap-2">
+        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+            style="width: 32px; height: 32px;">
+            <i class="bi bi-chat-text-fill"></i>
+        </div>
+        <div>
+            <span class="d-block fw-bold text-dark" style="font-size: 0.85rem; line-height: 1;">Soporte en línea</span>
+            <span class="text-muted" style="font-size: 0.8rem;">¿Tienes alguna duda con la plataforma?</span>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Floating Widget -->
+<button class="floating-chat-btn" id="chatInfoBtn" onclick="toggleInfoChat()">
+    <i class="bi bi-chat-dots-fill"></i>
+</button>
+
+<div class="chat-info-window" id="chatInfoWindow">
+    <div class="chat-info-header">
+        <h5>
+            <i class="bi bi-robot"></i> Aurelius AI
+        </h5>
+        <button onclick="toggleInfoChat()" class="btn btn-sm text-white"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="chat-info-body" id="chatInfoBody">
+        <div class="chat-msg bot">
+            ¡Hola! 👋 Soy Aurelius, tu guía en FinanzApp. ¿Qué te gustaría saber?
+        </div>
+
+        <!-- Preguntas Rápidas -->
+        <div class="quick-questions-container" id="quickQuestions">
+            <button class="quick-chip" onclick="askQuick('¿Es gratis?')">¿Es gratis?</button>
+            <button class="quick-chip" onclick="askQuick('¿Cómo me registro?')">¿Cómo me registro?</button>
+            <button class="quick-chip" onclick="askQuick('¿Es seguro?')">¿Es seguro?</button>
+            <button class="quick-chip" onclick="askQuick('¿Qué es Aurelius?')">¿Qué es Aurelius?</button>
+        </div>
+    </div>
+    <div class="chat-info-footer">
+        <input type="text" id="chatInfoInput" placeholder="Escribe tu duda..." onkeypress="handleInfoChatKey(event)">
+        <button onclick="sendInfoChat()">
+            <i class="bi bi-send-fill" style="font-size: 0.9rem;"></i>
+        </button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Loader Logic
+    function removeLoader() {
+        const loader = document.getElementById("loader-screen");
+        if (loader && loader.style.display !== 'none') {
+            loader.style.opacity = "0";
+            setTimeout(() => {
+                loader.style.display = "none";
+                // Trigger animations after loader is gone
+                document.querySelectorAll('.animate__animated').forEach(el => {
+                    el.style.visibility = 'visible';
+                });
+            }, 500);
+        }
+    }
+
+    // Attempt to remove loader on different events to be sure
+    window.addEventListener("DOMContentLoaded", removeLoader);
+    window.addEventListener("load", removeLoader);
+
+    // Absolute failsafe
+    setTimeout(removeLoader, 2000);
+
+    // Video Autoplay Handling
+    const video = document.getElementById('heroVideo');
+    if (video) {
+        // Ensure accurate path debug
+        console.log("Video source:", video.querySelector('source').src);
+
+        const playVideo = () => {
+            video.play().catch(error => {
+                console.log("Autoplay prevented:", error);
+                // Reduce UI impact if video fails
+                document.body.addEventListener('click', () => video.play(), { once: true });
+            });
+        };
+
+        if (document.readyState === 'complete') {
+            playVideo();
+        } else {
+            window.addEventListener('load', playVideo);
+        }
+    }
+
+    // Navbar Scroll Effect
+    // Mobile Menu Logic
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    function openMobileMenu() {
+        if (mobileMenu) {
+            mobileMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeMobileMenu() {
+        if (mobileMenu) {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', openMobileMenu);
+    if (closeMenuBtn) closeMenuBtn.addEventListener('click', closeMobileMenu);
+
+    // Navbar Scroll Effect
+    window.addEventListener('scroll', () => {
+        const navbar = document.querySelector('.custom-navbar');
+        const logoText = document.querySelector('.brand-text');
+        const navLinks = document.querySelectorAll('.desktop-menu .nav-link');
+        const hamburgerIcon = document.querySelector('.hamburger-btn i');
+
+        if (navbar) {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+                if (logoText) { logoText.classList.remove('text-white'); logoText.classList.add('text-dark'); }
+                navLinks.forEach(l => { l.classList.remove('text-white'); l.classList.add('text-dark'); });
+                if (hamburgerIcon) {
+                    hamburgerIcon.classList.remove('text-white'); hamburgerIcon.classList.add('text-dark');
+                }
+            } else {
+                navbar.classList.remove('scrolled');
+                if (logoText) { logoText.classList.remove('text-dark'); logoText.classList.add('text-white'); }
+                navLinks.forEach(l => { l.classList.remove('text-dark'); l.classList.add('text-white'); });
+                if (hamburgerIcon) {
+                    hamburgerIcon.classList.remove('text-dark'); hamburgerIcon.classList.add('text-white');
+                }
+            }
+        }
+    });
+
+    // Initialize Libraries Safely
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof Typed !== 'undefined') {
+            new Typed('#typed-text', {
+                strings: ['multiplicar tus ahorros', 'invertir con inteligencia', 'vivir tranquilo/a'],
+                typeSpeed: 60, backSpeed: 40, loop: true, backDelay: 1500
+            });
+        }
+
+        if (typeof Swiper !== 'undefined') {
+            new Swiper('.mySwiper', {
+                effect: "coverflow",
+                grabCursor: true,
+                centeredSlides: true,
+                slidesPerView: "auto",
+                loop: true,
+                coverflowEffect: {
+                    rotate: 50,
+                    stretch: 0,
+                    depth: 100,
+                    modifier: 1,
+                    slideShadows: true,
+                },
+                autoplay: { delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: true },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                breakpoints: {
+                    0: { slidesPerView: 1 },
+                    768: { slidesPerView: 2 },
+                    992: { slidesPerView: 3 }
+                }
+            });
+        }
+    });
+
+    // Modal Logic (Terms)
+    const termsModal = document.getElementById('terms-modal');
+    const closeTermsBtn = document.getElementById('closeTerms');
+    const termsLink = document.getElementById('termsLink');
+
+    if (termsLink && termsModal) {
+        termsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            termsModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (closeTermsBtn && termsModal) {
+        closeTermsBtn.addEventListener('click', () => {
+            termsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    }
+
+    // Modal Logic (Privacy)
+    const privacyModal = document.getElementById('privacy-modal');
+    const closePrivacyBtn = document.getElementById('closePrivacy');
+    const privacyLink = document.getElementById('privacyLink');
+
+    if (privacyLink && privacyModal) {
+        privacyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            privacyModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (closePrivacyBtn && privacyModal) {
+        closePrivacyBtn.addEventListener('click', () => {
+            privacyModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+    }
+
+    window.addEventListener('click', (e) => {
+        if (termsModal && e.target === termsModal) {
+            termsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        if (privacyModal && e.target === privacyModal) {
+            privacyModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // --- Chatbot Logic ---
+    function toggleInfoChat() {
+        const chatWindow = document.getElementById('chatInfoWindow');
+        const btn = document.getElementById('chatInfoBtn');
+        const backdrop = document.getElementById('chatBackdrop');
+        const navbar = document.querySelector('.custom-navbar');
+
+        if (chatWindow.style.display === 'flex') {
+            // CERRAR
+            chatWindow.style.display = 'none';
+            btn.innerHTML = '<i class="bi bi-chat-dots-fill"></i>';
+
+            // Ocultar blur con fade out
+            backdrop.style.opacity = '0';
+            setTimeout(() => { backdrop.style.display = 'none'; }, 300);
+
+            // Restaurar scroll
+            document.body.style.overflow = 'auto';
+            if (navbar) navbar.style.filter = 'none';
+
+        } else {
+            // ABRIR
+            chatWindow.style.display = 'flex';
+            btn.innerHTML = '<i class="bi bi-x-lg"></i>';
+
+            // Mostrar blur
+            backdrop.style.display = 'block';
+            setTimeout(() => { backdrop.style.opacity = '1'; }, 10);
+
+            // Bloquear scroll body
+            document.body.style.overflow = 'hidden';
+
+            // Focus input
+            setTimeout(() => document.getElementById('chatInfoInput').focus(), 100);
+        }
+    }
+
+    function askQuick(question) {
+        document.getElementById('chatInfoInput').value = question;
+        sendInfoChat();
+    }
+
+    function handleInfoChatKey(e) {
+        if (e.key === 'Enter') {
+            sendInfoChat();
+        }
+    }
+
+    // --- SCRIPTS CHATBOT & UI ---
+
+    // Bubble Logic
+    let inviteClosed = false;
+    window.addEventListener('scroll', () => {
+        const bubble = document.getElementById('chatInviteBubble');
+        const chatWindow = document.getElementById('chatInfoWindow');
+
+        // Mostrar burbuja si: scroll > 300, chat cerrado, no cerrada manualmente
+        if (window.scrollY > 300 && chatWindow.style.display !== 'flex' && !inviteClosed) {
+            bubble.classList.add('visible');
+        } else {
+            bubble.classList.remove('visible');
+        }
+    });
+
+    function closeInviteBubble() {
+        inviteClosed = true;
+        document.getElementById('chatInviteBubble').classList.remove('visible');
+    }
+
+    // TYPEWRITER EFFECT (Unified)
+    function typeWriter(element, html, speed = 15) {
+        let i = 0;
+        element.innerHTML = '';
+        const cursor = document.createElement('span');
+        cursor.className = 'typed-cursor';
+        element.appendChild(cursor);
+
+        function type() {
+            if (i < html.length) {
+                let char = html.charAt(i);
+
+                if (char === '<') {
+                    // Detectar tag HTML completo
+                    let tag = '';
+                    while (i < html.length && html.charAt(i) !== '>') {
+                        tag += html.charAt(i);
+                        i++;
+                    }
+                    tag += '>';
+                    i++;
+                    cursor.insertAdjacentHTML('beforebegin', tag);
+                } else {
+                    cursor.before(char);
+                    i++;
+                }
+                // NO Scroll automático durante escritura
+                setTimeout(type, speed);
+            } else {
+                cursor.remove();
+            }
+        }
+        type();
+    }
+
+    async function sendInfoChat() {
+        const input = document.getElementById('chatInfoInput');
+        const body = document.getElementById('chatInfoBody');
+        const sendBtn = document.querySelector('.chat-info-footer button');
+        const message = input.value.trim();
+        const quickContainer = document.getElementById('quickQuestions');
+
+        if (!message) return;
+
+        // Visual State: Clicked Send
+        sendBtn.innerHTML = `
+            <div class="loader-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>`;
+        sendBtn.disabled = true;
+
+        // Ocultar chips
+        if (quickContainer) quickContainer.style.display = 'none';
+
+        // Add User Message
+        body.innerHTML += `
+            <div class="chat-msg user mb-2 fade-in">${message}</div>
+        `;
+        input.value = '';
+        body.scrollTop = body.scrollHeight; // Scroll al fondo para ver mi mensaje
+
+        // Loading indicator (Bouncing Dots)
+        const loadingId = 'loading-' + Date.now();
+        const loadingHtml = `
+            <div class="chat-msg bot mb-2" id="${loadingId}">
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        `;
+        body.innerHTML += loadingHtml;
+        body.scrollTop = body.scrollHeight;
+
+        try {
+            const response = await fetch('/api/ask_support', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+
+            // Remove loading
+            const loader = document.getElementById(loadingId);
+            if (loader) loader.remove();
+
+            // Create container for bot message
+            const botMsgDiv = document.createElement('div');
+            botMsgDiv.className = 'chat-msg bot mb-2';
+            body.appendChild(botMsgDiv);
+
+            // SCROLL LOGIC: Scroll para mostrar el INICIO del mensaje del bot
+            if (botMsgDiv.offsetTop > body.scrollTop + body.clientHeight) {
+                botMsgDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            } else {
+                botMsgDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+            body.scrollTop = body.scrollTop + 50;
+
+            // Iniciar efecto Typed (sin auto-scroll interno)
+            typeWriter(botMsgDiv, data.response.replace(/<br>/g, '\n').replace(/<b>/g, '<strong>').replace(/<\/b>/g, '</strong>'), 15);
+
+        } catch (error) {
+            const loader = document.getElementById(loadingId);
+            if (loader) loader.remove();
+
+            body.innerHTML += `
+                <div class="chat-msg bot mb-2">Lo siento, hubo un error de conexión. Intenta nuevamente.</div>
+            `;
+            body.scrollTop = body.scrollHeight;
+        } finally {
+            // Restore Button
+            sendBtn.innerHTML = '<i class="bi bi-send-fill" style="font-size: 0.9rem;"></i>';
+            sendBtn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}
