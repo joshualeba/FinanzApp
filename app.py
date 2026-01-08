@@ -1166,7 +1166,9 @@ def ask_support():
         return jsonify({'response': "Hola, estoy teniendo problemas de conexión. Por favor escríbenos a soporte@finanzapp.com"})
 
 
+# Crear tablas en producción (Render/Gunicorn) al iniciar
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
