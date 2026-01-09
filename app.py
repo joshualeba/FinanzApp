@@ -64,7 +64,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False) # Nombre real en lugar de username
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(128), nullable=False) 
+    password = db.Column(db.String(255), nullable=False) 
+    auth_type = db.Column(db.String(20), default='email') # 'email' or 'google'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     transactions = db.relationship('Transaction', backref='author', lazy=True)
@@ -154,12 +155,13 @@ def register():
                  return jsonify({'success': False, 'message': 'Por favor, ingresa un correo electrónico válido con un dominio real.'})
 
             # Usar método por defecto de werkzeug (más compatible)
-            new_user = User(name=name, email=email, password=generate_password_hash(password))
+            new_user = User(name=name, email=email, password=generate_password_hash(password, method='pbkdf2:sha256'), auth_type='email')
             db.session.add(new_user)
             db.session.commit()
 
             login_user(new_user)
-            return jsonify({'success': True, 'redirect': url_for('dashboard')})
+            # Forzar redirección al dashboard limpio
+            return jsonify({'success': True, 'redirect': url_for('dashboard', section='dashboard')})
         
         except Exception as e:
             print(f"Error en Registro: {e}")
@@ -183,7 +185,8 @@ def login():
             return jsonify({'success': False, 'message': 'La contraseña ingresada no es correcta.'})
 
         login_user(user)
-        return jsonify({'success': True, 'redirect': url_for('dashboard')})
+        # Forzar redirección al dashboard limpio
+        return jsonify({'success': True, 'redirect': url_for('dashboard', section='dashboard')})
 
     return render_template('login.html')
 
@@ -225,13 +228,14 @@ def google_callback():
             user = User(
                 name=name or email.split('@')[0], 
                 email=email, 
-                password=generate_password_hash(random_pwd, method='pbkdf2:sha256')
+                password=generate_password_hash(random_pwd, method='pbkdf2:sha256'),
+                auth_type='google'
             )
             db.session.add(user)
             db.session.commit()
         
         login_user(user)
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard', section='dashboard'))
     except Exception as e:
         # En producción usar logger
         print(f"Error en Google Login: {e}")
@@ -790,6 +794,10 @@ def update_password():
         flash('Todos los campos son obligatorios.', 'error')
         return redirect(url_for('dashboard'))
 
+    if current_user.auth_type == 'google':
+         flash('No puedes cambiar la contraseña de una cuenta de Google.', 'error')
+         return redirect(url_for('dashboard'))
+
     if not check_password_hash(current_user.password, current_password):
         flash('La contraseña actual es incorrecta.', 'error')
         return redirect(url_for('dashboard'))
@@ -798,10 +806,13 @@ def update_password():
         flash('Las contraseñas nuevas no coinciden.', 'error')
         return redirect(url_for('dashboard'))
 
-    current_user.password = generate_password_hash(new_password)
+    current_user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
     db.session.commit()
+    
     flash('Contraseña actualizada correctamente.', 'success')
     return redirect(url_for('dashboard'))
+
+
 
 @app.route('/add_subscription', methods=['POST'])
 @login_required
@@ -1196,9 +1207,28 @@ def ask_support():
         return jsonify({'response': "Hola, estoy teniendo problemas de conexión. Por favor escríbenos a soporte@finanzapp.com"})
 
 
-# Crear tablas en producción (Render/Gunicorn) al iniciar
+# Crear tablas o actualizar esquema en producción
 with app.app_context():
     db.create_all()
+    
+    # Auto-Migración para añadir columna auth_type si falta (Soporte SQLite y Postgres)
+    from sqlalchemy import text, inspect
+    try:
+        inspector = inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns('user')]
+        
+        if 'auth_type' not in columns:
+            print(" * Migración: Detectada falta de columna 'auth_type'. Intentando añadirla...")
+            with db.engine.connect() as conn:
+                # Determinar dialecto para sintaxis exacta si fuera necesario (aunque ADD COLUMN es estándar)
+                # Postgres requiere comillas en "user" a veces si es reservado, pero SQLAlchemy lo mapea.
+                # Usamos text() para raw SQL seguro.
+                conn.execute(text('ALTER TABLE "user" ADD COLUMN auth_type VARCHAR(20) DEFAULT \'email\''))
+                conn.commit()
+            print(" * Migración: Columna 'auth_type' añadida con éxito.")
+    except Exception as e:
+        # Si falla (ej. tabla "user" vs "users" o dialecto), logueamos pero no detenemos la app
+        print(f" * Migración Advertencia: No se pudo verificar/actualizar esquema autom. Error: {e}")
 
 if __name__ == '__main__':
     print(f" * GROQ_API_KEY detected: {'GROQ_API_KEY' in os.environ}")

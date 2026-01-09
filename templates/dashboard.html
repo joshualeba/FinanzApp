@@ -1436,6 +1436,30 @@
                 display: none;
             }
 
+            /* TOAST NOTIFICATIONS GLASSMORPHISM */
+            .toast {
+                background: rgba(255, 255, 255, 0.75) !important;
+                backdrop-filter: blur(16px) !important;
+                -webkit-backdrop-filter: blur(16px) !important;
+                border: 1px solid rgba(255, 255, 255, 0.3) !important;
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+                color: var(--text-main) !important;
+                border-radius: 16px !important;
+                margin-bottom: 1rem;
+                padding: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                min-width: 300px;
+                animation: slideInRight 0.5s ease-out forwards;
+            }
+
+            [data-theme="dark"] .toast {
+                background: rgba(30, 30, 30, 0.75) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                color: white !important;
+            }
+
             /* Glassmorphism Cards */
             .insight-card-glass {
                 background: rgba(255, 255, 255, 0.6);
@@ -2275,9 +2299,24 @@
                                 identificador
                                 único.</small>
                         </div>
+
+                        {% if current_user.auth_type == 'google' %}
+                        <div class="mt-4 p-3 rounded-4"
+                            style="background: rgba(37,99,235,0.05); border: 1px dashed rgba(37,99,235,0.2);">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-google fs-3 text-primary"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-1" style="color: var(--text-main);">Cuenta vinculada</h6>
+                                    <p class="mb-0 small text-muted">Has iniciado sesión con Google. Tu seguridad se
+                                        gestiona desde allí.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
+                {% if current_user.auth_type != 'google' %}
                 <!-- Security Card -->
                 <div class="card border-0 shadow-sm" style="background: var(--card-bg); border-radius: 24px;">
                     <div class="card-body p-4">
@@ -2322,6 +2361,7 @@
                         </form>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -3723,6 +3763,16 @@
         };
 
         // Restore active section on load
+        // Check URL params first to override default behavior
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlSection = urlParams.get('section');
+
+        if (urlSection) {
+            localStorage.setItem('activeSection', urlSection);
+            // Optional: Clean URL
+            // window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
         const savedSection = localStorage.getItem('activeSection') || 'dashboard';
         // If it was movements, simulate click or just show
         // We need to be careful: if the user just logged in or came from index, maybe default to dashboard?
