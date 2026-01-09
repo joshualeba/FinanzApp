@@ -107,6 +107,8 @@ html,
 body {
     max-width: 100%;
     overflow-x: hidden;
+    position: relative;
+    /* Prevent horizontal scroll */
 }
 
 /* Logo */
@@ -310,7 +312,7 @@ body {
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     letter-spacing: -0.02em;
@@ -871,6 +873,8 @@ body {
     justify-content: center;
     cursor: pointer;
     transition: background 0.3s;
+    flex-shrink: 0;
+    /* Prevent squeezing */
 }
 
 .chat-info-footer button:hover {
@@ -911,6 +915,10 @@ body {
         right: 5%;
         bottom: 100px;
         height: 60vh;
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
     }
 }
 
@@ -1261,4 +1269,31 @@ body {
     .author-info small {
         font-size: 0.8rem;
     }
+}
+
+/* --- Reveal on Scroll Animation --- */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered delays for cards if needed, though IntersectionObserver handles natural scroll timing well. 
+   We can add helper classes for delays if strict staggering is desired. */
+.delay-100 {
+    transition-delay: 0.1s;
+}
+
+.delay-200 {
+    transition-delay: 0.2s;
+}
+
+.delay-300 {
+    transition-delay: 0.3s;
 }

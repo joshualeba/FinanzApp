@@ -11,7 +11,13 @@ import secrets
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-load_dotenv()
+# Explicitly load .env file
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+    print(f" * Loaded .env from: {dotenv_path}")
+else:
+    print(" * Warning: .env file not found.")
 
 app = Flask(__name__)
 # Fix para Render: Permitir que Flask detecte HTTPS detrás del proxy
@@ -1016,38 +1022,42 @@ def ask_aurelius():
         try:
             # Check for API key validity
             if not tavily_api_key:
-                print("TAVILY WARNING: No API Key configured.")
-                search_context = "AVISO: El usuario no ha configurado su Tavily API Key. Responde lo mejor que puedas con tu conocimiento base."
+                print("TAVILY WARNING: No API Key configured (Locally OK).")
+                search_context = "Nota para el asistente: No tienes acceso a búsqueda en internet en este momento. Responde usando solo tu conocimiento interno."
             else:
-                 from tavily import TavilyClient
-                 tavily = TavilyClient(api_key=tavily_api_key)
-                 
-                 # Optimizar query con LLM primero
-                 query_gen_prompt = [
-                    {"role": "system", "content": "You are a Search Query Generator. Output ONLY the best search query (keywords) for the user's question, focusing on finances in Mexico. Add 'Mexico' and 'actual' if relevant. NO explanations."},
-                    {"role": "user", "content": f"Question: {user_message}"}
-                 ]
-                 
-                 q_response = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
-                    messages=query_gen_prompt,
-                    max_tokens=30
-                 )
-                 search_query = q_response.choices[0].message.content.strip().replace('"', '')
-                 print(f"SEARCH QUERY OPTIMIZED (Tavily): {search_query}")
-
-                 # Ejecutar búsqueda con Tavily
-                 response = tavily.search(query=search_query, search_depth="basic", max_results=3)
-                 
-                 results_text = []
-                 for res in response.get('results', []):
-                     results_text.append(f"Title: {res['title']}\nSnippet: {res['content']}\nSource: {res['url']}")
-                 
-                 if results_text:
-                     search_context = "\n‼️ INFORMACIÓN EN TIEMPO REAL (PRIORIDAD MÁXIMA - USAR ESTO SOBRE TU CONOCIMIENTO INTERNO):\n"
-                     search_context += "\n".join(results_text)
-                 else:
-                     print("Tavily: No results found.")
+                 try:
+                     from tavily import TavilyClient
+                     tavily = TavilyClient(api_key=tavily_api_key)
+                     
+                     # Optimizar query con LLM primero
+                     query_gen_prompt = [
+                        {"role": "system", "content": "You are a Search Query Generator. Output ONLY the best search query (keywords) for the user's question, focusing on finances in Mexico. Add 'Mexico' and 'actual' if relevant. NO explanations."},
+                        {"role": "user", "content": f"Question: {user_message}"}
+                     ]
+                     
+                     q_response = client.chat.completions.create(
+                        model="llama-3.3-70b-versatile",
+                        messages=query_gen_prompt,
+                        max_tokens=30
+                     )
+                     search_query = q_response.choices[0].message.content.strip().replace('"', '')
+                     print(f"SEARCH QUERY OPTIMIZED (Tavily): {search_query}")
+    
+                     # Ejecutar búsqueda con Tavily
+                     response = tavily.search(query=search_query, search_depth="basic", max_results=3)
+                     
+                     results_text = []
+                     for res in response.get('results', []):
+                         results_text.append(f"Title: {res['title']}\nSnippet: {res['content']}\nSource: {res['url']}")
+                     
+                     if results_text:
+                         search_context = "\n‼️ INFORMACIÓN EN TIEMPO REAL (PRIORIDAD MÁXIMA - USAR ESTO SOBRE TU CONOCIMIENTO INTERNO):\n"
+                         search_context += "\n".join(results_text)
+                     else:
+                         print("Tavily: No results found.")
+                 except Exception as e:
+                     print(f"Tavily Import/Execution Error: {e}")
+                     search_context = "" # Fallback seguro
 
         except Exception as e:
             print(f"RAG Error (Tavily): {e}")
@@ -1155,9 +1165,12 @@ def ask_support():
     
     try:
         # Usamos la misma configuración de Groq
-        # NOTA: En producción, usar variables de entorno
         api_key = os.environ.get('GROQ_API_KEY')
         
+        if not api_key:
+            # Modo Local sin API Key (Mock Response para evitar errores)
+            return jsonify({'response': "⚠️ <b>Modo Desarrollo:</b> No se detectó <code style='background:#eee;padding:2px;'>GROQ_API_KEY</code> en tu .env local.<br><br>Por favor configura la variable de entorno para habilitar la IA. Mientras tanto, soy un bot simple: ¡Regístrate para probar la app!"})
+
         # Import OpenAI here just in case it wasn't imported globally or to ensure scope
         from openai import OpenAI
         client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
@@ -1188,4 +1201,5 @@ with app.app_context():
     db.create_all()
 
 if __name__ == '__main__':
+    print(f" * GROQ_API_KEY detected: {'GROQ_API_KEY' in os.environ}")
     app.run(debug=True)
