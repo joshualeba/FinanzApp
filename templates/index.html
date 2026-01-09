@@ -915,8 +915,9 @@
             backdrop.style.opacity = '0';
             setTimeout(() => { backdrop.style.display = 'none'; }, 300);
 
-            // Restaurar scroll
-            document.body.style.overflow = 'auto';
+            // Restaurar scroll - removemos la propiedad inline para que el CSS (overflow-x: hidden) vuelva a mandar
+            document.body.style.removeProperty('overflow');
+
             if (navbar) navbar.style.filter = 'none';
 
         } else {
@@ -928,7 +929,7 @@
             backdrop.style.display = 'block';
             setTimeout(() => { backdrop.style.opacity = '1'; }, 10);
 
-            // Bloquear scroll body
+            // Bloquear scroll body totalmente
             document.body.style.overflow = 'hidden';
 
             // Focus input

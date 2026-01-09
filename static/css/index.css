@@ -846,6 +846,8 @@ body {
 
 .chat-info-footer input {
     flex: 1;
+    min-width: 0;
+    /* Allow shrinking below content size if needed */
     border: 1px solid #CBD5E1;
     padding: 10px 15px;
     background: rgba(255, 255, 255, 0.8);
