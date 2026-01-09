@@ -3774,25 +3774,33 @@
         }
 
         const savedSection = localStorage.getItem('activeSection') || 'dashboard';
-        // If it was movements, simulate click or just show
-        // We need to be careful: if the user just logged in or came from index, maybe default to dashboard?
-        // Let's assume dashboard default if not found
-        if (savedSection !== 'dashboard') {
-            // Manually trigger the show logic without event
-            const sections = document.querySelectorAll('.content-body');
-            sections.forEach(sec => sec.classList.add('d-none'));
-            const target = document.getElementById('section-' + savedSection);
-            if (target) target.classList.remove('d-none');
 
-            // Update sidebar active class logic manually
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('onclick') && link.getAttribute('onclick').includes(savedSection)) {
-                    link.classList.add('active');
-                }
-            });
+        // Force UI update for ANY section (including dashboard) to prevent blank states
+        const sections = document.querySelectorAll('.content-body');
+        sections.forEach(sec => sec.classList.add('d-none'));
+
+        const target = document.getElementById('section-' + savedSection);
+        if (target) {
+            target.classList.remove('d-none');
+        } else {
+            // Fallback if section doesn't exist
+            const dash = document.getElementById('section-dashboard');
+            if (dash) dash.classList.remove('d-none');
         }
+
+        // Update sidebar active class manually
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const onClickObj = link.getAttribute('onclick');
+            if (onClickObj && onClickObj.includes(`'${savedSection}'`)) {
+                link.classList.add('active');
+            }
+            // Fallback for dashboard if stored section was 'dashboard'
+            if (savedSection === 'dashboard' && onClickObj && onClickObj.includes("'dashboard'")) {
+                link.classList.add('active');
+            }
+        });
 
         // Toggle Logic for Premium Form
         window.updateToggle = function (element) {
