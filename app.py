@@ -790,27 +790,46 @@ def update_password():
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
 
+    import re
+
     if not current_password or not new_password or not confirm_password:
         flash('Todos los campos son obligatorios.', 'error')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard', section='profile'))
 
     if current_user.auth_type == 'google':
          flash('No puedes cambiar la contraseña de una cuenta de Google.', 'error')
-         return redirect(url_for('dashboard'))
+         return redirect(url_for('dashboard', section='profile'))
 
     if not check_password_hash(current_user.password, current_password):
         flash('La contraseña actual es incorrecta.', 'error')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard', section='profile'))
 
     if new_password != confirm_password:
         flash('Las contraseñas nuevas no coinciden.', 'error')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('dashboard', section='profile'))
+    
+    # Password Strength Validation (Same as Registration)
+    if len(new_password) < 8:
+        flash('La nueva contraseña debe tener al menos 8 caracteres.', 'error')
+        return redirect(url_for('dashboard', section='profile'))
+    
+    if len(new_password) > 50:
+         flash('La contraseña es demasiado larga (máx 50 catacteres).', 'error')
+         return redirect(url_for('dashboard', section='profile'))
+
+    if not re.search(r"[A-Z]", new_password):
+        flash('La contraseña debe incluir al menos una mayúscula.', 'error')
+        return redirect(url_for('dashboard', section='profile'))
+        
+    if not re.search(r"[\W_]", new_password):
+        flash('La contraseña debe incluir al menos un carácter especial (@, #, $, etc).', 'error')
+        return redirect(url_for('dashboard', section='profile'))
 
     current_user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
     db.session.commit()
     
     flash('Contraseña actualizada correctamente.', 'success')
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('dashboard', section='profile'))
 
 
 

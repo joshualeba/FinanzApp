@@ -2342,6 +2342,23 @@
                                     <i class="bi bi-eye-slash toggle-password"
                                         onclick="togglePasswordVisibility('new_password', this)"></i>
                                 </div>
+                                <!-- Password Strength Indicators -->
+                                <div class="mt-2 ps-1">
+                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-1">
+                                        <li id="rule-length" class="text-muted small d-flex align-items-center gap-2"
+                                            style="font-size: 0.75rem; transition: all 0.2s;">
+                                            <i class="bi bi-circle fs-6"></i> Mínimo 8 caracteres
+                                        </li>
+                                        <li id="rule-upper" class="text-muted small d-flex align-items-center gap-2"
+                                            style="font-size: 0.75rem; transition: all 0.2s;">
+                                            <i class="bi bi-circle fs-6"></i> Al menos una mayúscula
+                                        </li>
+                                        <li id="rule-special" class="text-muted small d-flex align-items-center gap-2"
+                                            style="font-size: 0.75rem; transition: all 0.2s;">
+                                            <i class="bi bi-circle fs-6"></i> Un carácter especial (@, #, $, etc.)
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label text-muted small">Confirmar nueva
@@ -3793,11 +3810,13 @@
         navLinks.forEach(link => {
             link.classList.remove('active');
             const onClickObj = link.getAttribute('onclick');
+
+            // Standard Match
             if (onClickObj && onClickObj.includes(`'${savedSection}'`)) {
                 link.classList.add('active');
             }
-            // Fallback for dashboard if stored section was 'dashboard'
-            if (savedSection === 'dashboard' && onClickObj && onClickObj.includes("'dashboard'")) {
+            // Fix for Dashboard specifically (sometimes savedSection might be 'dashboard')
+            else if (savedSection === 'dashboard' && onClickObj && onClickObj.includes("'dashboard'")) {
                 link.classList.add('active');
             }
         });
@@ -4149,6 +4168,43 @@
                 }
             }
         });
+
+        // --- REAL TIME PASSWORD VALIDATION ---
+        const newPassInput = document.getElementById('new_password');
+        if (newPassInput) {
+            newPassInput.addEventListener('input', function () {
+                const val = this.value;
+
+                const ruleLength = document.getElementById('rule-length');
+                const ruleUpper = document.getElementById('rule-upper');
+                const ruleSpecial = document.getElementById('rule-special');
+
+                // Helpers
+                const setValid = (el, valid) => {
+                    const icon = el.querySelector('i');
+                    if (valid) {
+                        el.classList.remove('text-muted');
+                        el.classList.add('text-success', 'fw-bold');
+                        icon.classList.remove('bi-circle');
+                        icon.classList.add('bi-check-circle-fill');
+                    } else {
+                        el.classList.add('text-muted');
+                        el.classList.remove('text-success', 'fw-bold');
+                        icon.classList.add('bi-circle');
+                        icon.classList.remove('bi-check-circle-fill');
+                    }
+                };
+
+                // Check Length
+                setValid(ruleLength, val.length >= 8);
+
+                // Check Upper
+                setValid(ruleUpper, /[A-Z]/.test(val));
+
+                // Check Special
+                setValid(ruleSpecial, /[\W_]/.test(val));
+            });
+        }
     </script>
 </div>
 </div>
