@@ -757,7 +757,7 @@
                                     </div>
                                 </div>
 
-                                <a href="{{ url_for('download_report') }}" onclick="showReportLoader()"
+                                <a href="{{ url_for('download_report') }}" onclick="downloadReport(event, this.href)"
                                     class="btn btn-primary btn-premium rounded-pill px-4">
                                     <i class="bi bi-file-earmark-pdf-fill me-2"></i> Descargar reporte
                                 </a>
@@ -4262,31 +4262,74 @@
 </div>
 
 <script>
-    function showReportLoader() {
+    window.downloadReport = function (event, url) {
+        event.preventDefault();
+
         const loader = document.getElementById('loader-screen');
         const textArea = loader.querySelector('.loader-text');
 
-        // Save original text if not already saved (optional safety)
+        // Save original text
         if (!loader.dataset.originalText) {
             loader.dataset.originalText = textArea.innerText;
         }
 
-        textArea.innerText = "Generando reporte...";
+        textArea.innerText = "Generando y descargando reporte...";
         loader.style.display = 'flex';
-        // Force reflow to ensure transition works if needed
-        void loader.offsetWidth;
+        void loader.offsetWidth; // Force reflow
         loader.style.opacity = '1';
 
-        // Hide after 4 seconds to give time for the server request and download start
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                if (loader.dataset.originalText) {
-                    textArea.innerText = loader.dataset.originalText;
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la red');
+
+                // Try to get filename
+                const disposition = response.headers.get('Content-Disposition');
+                let filename = 'Reporte_FinanzApp.pdf';
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+                    if (matches != null && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
                 }
-            }, 500);
-        }, 4000);
+
+                return response.blob().then(blob => ({ blob, filename }));
+            })
+            .then(({ blob, filename }) => {
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                a.remove();
+
+                // Hide loader
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    if (loader.dataset.originalText) textArea.innerText = loader.dataset.originalText;
+                }, 500);
+
+                if (window.showToast) window.showToast('¡Éxito!', 'Reporte descargado correctamente', 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                // Hide loader
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    if (loader.dataset.originalText) textArea.innerText = loader.dataset.originalText;
+                }, 500);
+
+                if (window.openAlertModal) {
+                    window.openAlertModal('Error', 'No se pudo generar el reporte. Inténtalo de nuevo.', true);
+                } else {
+                    alert('Error al descargar el reporte');
+                }
+            });
     }
 </script>
 {% endblock %}

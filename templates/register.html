@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Crear Cuenta - FinanzApp{% endblock %}
+{% block title %}Crear cuenta - FinanzApp{% endblock %}
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/iniciar_sesion.css') }}">
@@ -25,7 +25,7 @@
             <div class="text-center mb-4 d-md-none">
                 <img src="{{ url_for('static', filename='multimedia/logo.png') }}" style="width: 60px;">
             </div>
-            <h2>Comienza Hoy</h2>
+            <h2>Comienza hoy</h2>
             <p>Ingresa tus datos para crear una cuenta. ¿Ya tienes una? <a href="{{ url_for('login') }}">Inicia
                     sesión</a></p>
 
@@ -49,7 +49,7 @@
 
                 <div class="input-container mt-2">
                     <input type="password" id="confirm_password" name="confirm_password"
-                        placeholder="Confirmar Contraseña" required maxlength="25">
+                        placeholder="Confirmar contraseña" required maxlength="25">
                     <span id="eye-icon-confirm" class="fa fa-eye"
                         onclick="togglePasswordVisibility('confirm_password')"></span>
                 </div>
@@ -63,7 +63,7 @@
                 <div id="password-match-msg" style="font-size: 0.85rem; color: #DC2626; display: none;">Las contraseñas
                     no coinciden</div>
 
-                <button type="submit" class="boton-principal" id="submitBtn" disabled>Crear Cuenta</button>
+                <button type="submit" class="boton-principal" id="submitBtn" disabled>Crear cuenta</button>
 
                 <div class="separator">o regístrate con</div>
 

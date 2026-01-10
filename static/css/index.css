@@ -18,7 +18,7 @@ body {
     background-color: var(--secondary-color);
     color: var(--text-dark);
     font-family: 'Poppins', sans-serif;
-    overflow-x: hidden;
+    overflow-x: hidden !important;
     width: 100%;
 }
 
@@ -190,13 +190,28 @@ body {
 /* Hero */
 .hero-section {
     position: relative;
-    height: 100vh;
+    /* height: 100vh;  Removed to allow min-height logic below */
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     z-index: 1;
     /* Crear contexto de apilamiento */
+}
+
+@media (max-height: 700px) {
+    .hero-section {
+        min-height: 100vh;
+        height: auto;
+        padding-top: 100px;
+        padding-bottom: 50px;
+    }
+
+    .hero-video {
+        height: 120%;
+        /* Ensure video covers extra scroll area if needed */
+    }
 }
 
 .hero-video {

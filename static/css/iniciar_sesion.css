@@ -23,14 +23,38 @@ body {
 .lado-izquierdo {
     background-color: #FFFFFF;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    overflow-y: auto;
+    /* Scroll vertical si falta espacio */
+    height: 100vh;
+    position: relative;
+}
+
+/* Custom Scrollbar for Auth Form */
+.lado-izquierdo::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lado-izquierdo::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.lado-izquierdo::-webkit-scrollbar-thumb {
+    background-color: #CBD5E1;
+    border-radius: 20px;
+    border: 2px solid #FFFFFF;
+}
+
+.lado-izquierdo::-webkit-scrollbar-thumb:hover {
+    background-color: #94A3B8;
 }
 
 .formulario {
     width: 80%;
     max-width: 450px;
-    padding: 2rem;
+    padding: 3rem 2rem;
+    margin: auto;
+    /* Center vertically and horizontally safely */
 }
 
 .formulario h2 {
