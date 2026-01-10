@@ -3546,6 +3546,9 @@
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', (e) => {
                     e.preventDefault();
+                    if (window.innerWidth < 992) {
+                        toggleSidebar(false);
+                    }
                     modal.style.display = 'flex';
                 });
             }
