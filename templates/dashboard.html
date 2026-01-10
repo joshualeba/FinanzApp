@@ -145,6 +145,8 @@
             <!-- Toasts Container -->
             <div id="toast-container" class="toast-container"></div>
 
+            <!-- Scripts Dependencies (Chart.js removed, loaded in block scripts) -->
+
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
             <script id="flash-messages" type="application/json">
@@ -2316,69 +2318,7 @@
                     </div>
                 </div>
 
-                {% if current_user.auth_type != 'google' %}
-                <!-- Security Card -->
-                <div class="card border-0 shadow-sm" style="background: var(--card-bg); border-radius: 24px;">
-                    <div class="card-body p-4">
-                        <h4 class="card-title mb-4 fw-bold" style="color: var(--text-main);">Seguridad</h4>
-                        <form action="{{ url_for('update_password') }}" method="POST">
-                            <div class="mb-3">
-                                <label class="form-label text-muted small">Contraseña actual</label>
-                                <div class="input-group-premium">
-                                    <i class="bi bi-lock-fill"></i>
-                                    <input type="password" name="current_password" id="current_password"
-                                        class="form-control-premium" placeholder="Ingresa tu contraseña actual"
-                                        required>
-                                    <i class="bi bi-eye-slash toggle-password"
-                                        onclick="togglePasswordVisibility('current_password', this)"></i>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted small">Nueva contraseña</label>
-                                <div class="input-group-premium">
-                                    <i class="bi bi-key-fill"></i>
-                                    <input type="password" name="new_password" id="new_password"
-                                        class="form-control-premium" placeholder="Ingresa la nueva contraseña" required>
-                                    <i class="bi bi-eye-slash toggle-password"
-                                        onclick="togglePasswordVisibility('new_password', this)"></i>
-                                </div>
-                                <!-- Password Strength Indicators -->
-                                <div class="mt-2 ps-1">
-                                    <ul class="list-unstyled mb-0 d-flex flex-column gap-1">
-                                        <li id="rule-length" class="text-muted small d-flex align-items-center gap-2"
-                                            style="font-size: 0.75rem; transition: all 0.2s;">
-                                            <i class="bi bi-circle fs-6"></i> Mínimo 8 caracteres
-                                        </li>
-                                        <li id="rule-upper" class="text-muted small d-flex align-items-center gap-2"
-                                            style="font-size: 0.75rem; transition: all 0.2s;">
-                                            <i class="bi bi-circle fs-6"></i> Al menos una mayúscula
-                                        </li>
-                                        <li id="rule-special" class="text-muted small d-flex align-items-center gap-2"
-                                            style="font-size: 0.75rem; transition: all 0.2s;">
-                                            <i class="bi bi-circle fs-6"></i> Un carácter especial (@, #, $, etc.)
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label text-muted small">Confirmar nueva
-                                    contraseña</label>
-                                <div class="input-group-premium">
-                                    <i class="bi bi-check-circle-fill"></i>
-                                    <input type="password" name="confirm_password" id="confirm_password"
-                                        class="form-control-premium" placeholder="Repite la nueva contraseña" required>
-                                    <i class="bi bi-eye-slash toggle-password"
-                                        onclick="togglePasswordVisibility('confirm_password', this)"></i>
-                                </div>
-                            </div>
 
-                            <button type="submit" class="btn btn-primary btn-premium w-100 py-3 rounded-pill">
-                                <i class="bi bi-shield-lock-fill me-2"></i> Actualizar contraseña
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
@@ -3703,33 +3643,10 @@
         }
 
         // Mobile Sidebar Logic
-        const openSidebarBtn = document.getElementById('openSidebar');
-        const closeSidebarBtn = document.getElementById('closeSidebar');
-        const sidebar = document.querySelector('.sidebar');
-        const mainWrapper = document.querySelector('.main-wrapper');
-
-        // Create backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'sidebar-backdrop';
-        document.body.appendChild(backdrop);
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('active');
-            backdrop.classList.toggle('active');
-            // Prevent body scroll when sidebar open on mobile
-            if (sidebar.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
+        // Ensure scrolling is enabled on load for mobile
+        if (window.innerWidth <= 992) {
+            document.body.style.overflow = '';
         }
-
-        if (openSidebarBtn) openSidebarBtn.addEventListener('click', toggleSidebar);
-        if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', toggleSidebar);
-        backdrop.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            backdrop.classList.remove('active');
-        });
 
         // SPA Navigation Logic
         window.showSection = function (sectionId) {
@@ -4136,75 +4053,71 @@
             }, 4000);
         }
 
-        // Process Flash Messages
-        const flashMessagesElem = document.getElementById('flash-messages');
-        if (flashMessagesElem) {
-            try {
-                const messages = JSON.parse(flashMessagesElem.textContent);
-                messages.forEach(([category, message]) => {
-                    const type = category === 'success' ? 'success' : 'error';
-                    const title = category === 'success' ? '¡Éxito!' : 'Atención';
-                    showToast(title, message, type);
-                });
-            } catch (e) {
-                console.error("Error parsing flash messages", e);
-            }
-        }
+        // --- GLOBAL UTILITIES & VALIDATION (Runs after DOM is ready) ---
+        document.addEventListener('DOMContentLoaded', () => {
 
-
-
-        // --- GLOBAL BUTTON LOADING STATE ---
-        document.addEventListener('submit', function (e) {
-            const form = e.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-
-            if (submitBtn && !form.getAttribute('data-no-loading')) {
-                // Check validity first (if browser validation is used)
-                if (form.checkValidity()) {
-                    submitBtn.classList.add('btn-loading');
-                    const originalText = submitBtn.innerHTML;
-                    // Optional: Restore after timeout if it's an AJAX form (prevent eternal spin)
-                    // But for normal submits, page reload will clear it.
+            // 1. Process Flash Messages
+            const flashMessagesElem = document.getElementById('flash-messages');
+            if (flashMessagesElem) {
+                try {
+                    const messages = JSON.parse(flashMessagesElem.textContent);
+                    messages.forEach(([category, message]) => {
+                        const type = category === 'success' ? 'success' : 'error';
+                        const title = category === 'success' ? '¡Éxito!' : 'Atención';
+                        if (window.showToast) window.showToast(title, message, type);
+                    });
+                } catch (e) {
+                    console.error("Error parsing flash messages", e);
                 }
             }
-        });
 
-        // --- REAL TIME PASSWORD VALIDATION ---
-        const newPassInput = document.getElementById('new_password');
-        if (newPassInput) {
-            newPassInput.addEventListener('input', function () {
-                const val = this.value;
-
-                const ruleLength = document.getElementById('rule-length');
-                const ruleUpper = document.getElementById('rule-upper');
-                const ruleSpecial = document.getElementById('rule-special');
-
-                // Helpers
-                const setValid = (el, valid) => {
-                    const icon = el.querySelector('i');
-                    if (valid) {
-                        el.classList.remove('text-muted');
-                        el.classList.add('text-success', 'fw-bold');
-                        icon.classList.remove('bi-circle');
-                        icon.classList.add('bi-check-circle-fill');
-                    } else {
-                        el.classList.add('text-muted');
-                        el.classList.remove('text-success', 'fw-bold');
-                        icon.classList.add('bi-circle');
-                        icon.classList.remove('bi-check-circle-fill');
+            // 2. Button Loading State
+            document.addEventListener('submit', function (e) {
+                const form = e.target;
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn && !form.getAttribute('data-no-loading')) {
+                    if (form.checkValidity()) {
+                        submitBtn.classList.add('btn-loading');
                     }
-                };
-
-                // Check Length
-                setValid(ruleLength, val.length >= 8);
-
-                // Check Upper
-                setValid(ruleUpper, /[A-Z]/.test(val));
-
-                // Check Special
-                setValid(ruleSpecial, /[\W_]/.test(val));
+                }
             });
-        }
+
+            // 3. Real Time Password Validation
+            const newPassInput = document.getElementById('new_password');
+            if (newPassInput) {
+                newPassInput.addEventListener('input', function () {
+                    const val = this.value;
+
+                    const ruleLength = document.getElementById('rule-length');
+                    const ruleUpper = document.getElementById('rule-upper');
+                    const ruleSpecial = document.getElementById('rule-special');
+
+                    // Helpers
+                    const setValid = (el, valid) => {
+                        if (!el) return;
+                        const icon = el.querySelector('i');
+                        if (valid) {
+                            el.classList.remove('text-muted');
+                            el.classList.add('text-success', 'fw-bold');
+                            icon.classList.remove('bi-circle');
+                            icon.classList.add('bi-check-circle-fill');
+                        } else {
+                            el.classList.add('text-muted');
+                            el.classList.remove('text-success', 'fw-bold');
+                            icon.classList.add('bi-circle');
+                            icon.classList.remove('bi-check-circle-fill');
+                        }
+                    };
+
+                    // Check Length
+                    setValid(ruleLength, val.length >= 8);
+                    // Check Upper
+                    setValid(ruleUpper, /[A-Z]/.test(val));
+                    // Check Special
+                    setValid(ruleSpecial, /[\W_]/.test(val));
+                });
+            }
+        });
     </script>
 </div>
 </div>

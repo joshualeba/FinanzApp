@@ -724,6 +724,7 @@ body {
     }
 
     /* Fix for Calendar and Reports scrolling on mobile */
+    #section-dashboard,
     #section-calendar,
     #section-reports,
     #section-movements,
